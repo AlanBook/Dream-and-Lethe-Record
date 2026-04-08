@@ -262,9 +262,9 @@
 
     ctx.fillStyle = '#333333';
     ctx.font = '16px "Noto Serif SC"';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
-    ctx.fillText('企划运营/制作人', padding.left + plotWidth / 2, producerBarY - 8);
+    ctx.fillText('企划运营/制作人', padding.left, producerBarY - 8);
 
     ctx.fillStyle = '#333333';
     ctx.font = '14px "Noto Serif SC"';
@@ -278,8 +278,8 @@
 
     ctx.fillStyle = '#333333';
     ctx.font = '16px "Noto Serif SC"';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('发布时间', padding.left + plotWidth / 2, padding.top + plotHeight + 55);
+    ctx.fillText('发布时间', padding.left, padding.top + plotHeight + 55);
   }
 })();
