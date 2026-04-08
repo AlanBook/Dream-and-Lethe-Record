@@ -3,7 +3,7 @@ const STATS_COLORS = {
   "作曲": "#66ccff",
   "编曲": "#00FFCC",
   "调校": "#006666",
-  "演唱": "#FFFF00"
+  "演唱": "#0080FF"
 };
 
 let currentTab = "作词";
