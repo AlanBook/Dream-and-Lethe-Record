@@ -281,5 +281,47 @@
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText('发布时间', padding.left, padding.top + plotHeight + 55);
+
+    setupExportButton();
+  }
+
+  function setupExportButton() {
+    const exportButton = document.getElementById('exportChart');
+    if (!exportButton) return;
+
+    exportButton.addEventListener('click', function() {
+      const canvas = document.getElementById('mainChart');
+      if (!canvas) return;
+
+      // 创建一个新的Canvas，添加标题
+      const exportCanvas = document.createElement('canvas');
+      const exportCtx = exportCanvas.getContext('2d');
+      
+      // 计算新Canvas的尺寸（添加标题空间）
+      const titleHeight = 80;
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height + titleHeight;
+      
+      // 填充白色背景
+      exportCtx.fillStyle = '#ffffff';
+      exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      
+      // 添加标题
+      exportCtx.fillStyle = '#b85c4a';
+      exportCtx.font = '24px "Noto Serif SC"';
+      exportCtx.textAlign = 'center';
+      exportCtx.textBaseline = 'middle';
+      exportCtx.fillText('📔《忘川风华录》音企原创曲概览', exportCanvas.width / 2, titleHeight / 2);
+      
+      // 绘制原始图表
+      exportCtx.drawImage(canvas, 0, titleHeight);
+      
+      // 转换为PNG并下载
+      const dataURL = exportCanvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = '忘川风华录_音企原创曲概览.png';
+      link.click();
+    });
   }
 })();
