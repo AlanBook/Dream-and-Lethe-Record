@@ -3,5 +3,9 @@
     "canvas": "^3.2.3",
     "jsdom": "^29.0.2",
     "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "fetch": "node scripts/fetch_bilibili.js",
+    "extract": "node scripts/extract_excel.js"
   }
 }

@@ -10,6 +10,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof DATA !== 'undefined' && DATA.songs) {
       drawChart();
+      renderStatsSummary();
     }
     initTabs();
     setupReveal();
@@ -114,7 +115,7 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, chartWidth, chartHeight);
 
-    const maxPlayCount = Math.max(...songs.map(s => s.play_count));
+    const maxPlayCount = Math.max(...songs.map(s => s.stats.play));
     const yAxisMax = Math.max(Math.ceil(maxPlayCount / 1000000) * 1000000, 12000000);
     const plotHeight = chartHeight - padding.top - padding.bottom;
     const plotWidth = songs.length * songWidth;
@@ -139,7 +140,7 @@
     const pointRadius = 8;
     songs.forEach((song, i) => {
       const x = padding.left + i * songWidth + songWidth / 2;
-      const y = getY(song.play_count, yAxisMax, plotHeight, padding);
+      const y = getY(song.stats.play, yAxisMax, plotHeight, padding);
       points.push({ x, y });
 
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, pointRadius * 2);
@@ -171,19 +172,11 @@
       ctx.fillText(song.name, 0, 0);
       ctx.restore();
 
-      const playCountDisplay = song.play_count_display;
-      let displayText = '播放量：';
-      if (playCountDisplay.includes('万')) {
-        displayText += playCountDisplay;
-      } else {
-        displayText += formatPlayCount(parseFloat(playCountDisplay) || song.play_count);
-      }
-
       ctx.fillStyle = '#8b6b4a';
       ctx.font = '12px "Noto Serif SC"';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(displayText, x, y + pointRadius + 10);
+      ctx.fillText('播放量：' + formatPlayCount(song.stats.play), x, y + pointRadius + 10);
 
       if (song.achievement) {
         let achievementColor = '#666666';
@@ -324,4 +317,147 @@
       link.click();
     });
   }
+
+  // ============ 动态统计摘要渲染 ============
+
+  function renderStatsSummary() {
+    const container = document.getElementById('statsSummary');
+    if (!container || !DATA.songs) return;
+
+    const songs = DATA.songs;
+
+    // 辅助：计算 max/min/avg
+    function calcStats(arr) {
+      const max = Math.max(...arr);
+      const min = Math.min(...arr);
+      const avg = Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+      return { max, min, avg };
+    }
+
+    // 找到最高/最低对应的歌曲名
+    function findSongByStat(key, value) {
+      const song = songs.find(s => s.stats[key] === value);
+      return song ? song.name : '';
+    }
+
+    const playStats = calcStats(songs.map(s => s.stats.play));
+    const danmakuStats = calcStats(songs.map(s => s.stats.danmaku));
+    const likeStats = calcStats(songs.map(s => s.stats.like));
+    const coinStats = calcStats(songs.map(s => s.stats.coin));
+    const favoriteStats = calcStats(songs.map(s => s.stats.favorite));
+
+    // 查找极值对应的歌曲
+    const maxPlaySong = findSongByStat('play', playStats.max);
+    const minPlaySong = findSongByStat('play', playStats.min);
+    const maxDanmakuSong = findSongByStat('danmaku', danmakuStats.max);
+    const minDanmakuSong = findSongByStat('danmaku', danmakuStats.min);
+    const maxLikeSong = findSongByStat('like', likeStats.max);
+    const minLikeSong = findSongByStat('like', likeStats.min);
+    const maxCoinSong = findSongByStat('coin', coinStats.max);
+    const minCoinSong = findSongByStat('coin', coinStats.min);
+    const maxFavSong = findSongByStat('favorite', favoriteStats.max);
+    const minFavSong = findSongByStat('favorite', favoriteStats.min);
+
+    // 播放成就统计
+    const achievementCount = {};
+    songs.forEach(s => {
+      const a = s.achievement || '未知';
+      achievementCount[a] = (achievementCount[a] || 0) + 1;
+    });
+
+    // 成就排序和显示名映射
+    const achievementOrder = ['神话', '申舌', '传说', '殿堂'];
+    const achievementClass = {
+      '神话': 'myth',
+      '申舌': 'shenshe',
+      '传说': 'legend',
+      '殿堂': 'hall'
+    };
+
+    // 获取最新更新时间（取所有歌曲中最大的 last_updated）
+    const dates = songs.map(s => s.last_updated).filter(Boolean);
+    const latestDate = dates.length > 0 ? dates.sort().reverse()[0] : '未知';
+
+    // 构建 HTML
+    let html = '';
+
+    // 统计部分
+    html += '<div class="stats-section">';
+    html += '<h3 class="stats-title">📊 原创曲统计</h3>';
+    html += '<div class="stats-grid">';
+
+    // 播放量
+    html += '<div class="stat-item">';
+    html += '<div class="stat-label">播放量</div>';
+    html += '<div class="stat-value">最高：' + formatPlayCount(playStats.max) + '（' + maxPlaySong + '）</div>';
+    html += '<div class="stat-value">最低：' + formatPlayCount(playStats.min) + '（' + minPlaySong + '）</div>';
+    html += '<div class="stat-value">平均：' + formatPlayCount(playStats.avg) + '</div>';
+    html += '</div>';
+
+    // 弹幕数
+    html += '<div class="stat-item">';
+    html += '<div class="stat-label">弹幕数</div>';
+    html += '<div class="stat-value">最高：' + formatPlayCount(danmakuStats.max) + '（' + maxDanmakuSong + '）</div>';
+    html += '<div class="stat-value">最低：' + formatPlayCount(danmakuStats.min) + '（' + minDanmakuSong + '）</div>';
+    html += '<div class="stat-value">平均：' + formatPlayCount(danmakuStats.avg) + '</div>';
+    html += '</div>';
+
+    // 点赞数
+    html += '<div class="stat-item">';
+    html += '<div class="stat-label">点赞数</div>';
+    html += '<div class="stat-value">最高：' + formatPlayCount(likeStats.max) + '（' + maxLikeSong + '）</div>';
+    html += '<div class="stat-value">最低：' + formatPlayCount(likeStats.min) + '（' + minLikeSong + '）</div>';
+    html += '<div class="stat-value">平均：' + formatPlayCount(likeStats.avg) + '</div>';
+    html += '</div>';
+
+    // 投币数
+    html += '<div class="stat-item">';
+    html += '<div class="stat-label">投币数</div>';
+    html += '<div class="stat-value">最高：' + formatPlayCount(coinStats.max) + '（' + maxCoinSong + '）</div>';
+    html += '<div class="stat-value">最低：' + formatPlayCount(coinStats.min) + '（' + minCoinSong + '）</div>';
+    html += '<div class="stat-value">平均：' + formatPlayCount(coinStats.avg) + '</div>';
+    html += '</div>';
+
+    // 收藏数
+    html += '<div class="stat-item">';
+    html += '<div class="stat-label">收藏数</div>';
+    html += '<div class="stat-value">最高：' + formatPlayCount(favoriteStats.max) + '（' + maxFavSong + '）</div>';
+    html += '<div class="stat-value">最低：' + formatPlayCount(favoriteStats.min) + '（' + minFavSong + '）</div>';
+    html += '<div class="stat-value">平均：' + formatPlayCount(favoriteStats.avg) + '</div>';
+    html += '</div>';
+
+    html += '</div>';
+    html += '</div>';
+
+    // 播放成就
+    html += '<div class="stats-section">';
+    html += '<h3 class="stats-title">🏆 播放成就统计</h3>';
+    html += '<div class="achievement-grid">';
+
+    achievementOrder.forEach(key => {
+      if (achievementCount[key]) {
+        html += '<div class="achievement-item ' + (achievementClass[key] || '') + '">';
+        html += '<span class="achievement-label">' + key + '</span>';
+        html += '<span class="achievement-count">' + achievementCount[key] + '</span>';
+        html += '</div>';
+      }
+    });
+
+    html += '</div>';
+    html += '</div>';
+
+    // 说明部分
+    html += '<div class="stats-section">';
+    html += '<details class="note-text" style="margin-bottom:1rem;">';
+    html += '<summary style="color:var(--c-gold);cursor:pointer;font-weight:600;font-size:1.3rem;">📝 图表说明</summary>';
+    html += '<div style="margin-top:1rem;">';
+    html += '<p><strong>对数刻度设计：</strong>为了让200万以下播放量的歌曲有更好的展示空间，本图表采用对数刻度（log₁₀），而非线性刻度。这样可以避免高播放量歌曲使图表过于压缩，同时更清晰地展示低播放量区间的变化趋势。</p>';
+    html += '<p><strong>数据最后更新：</strong>' + latestDate + '</p>';
+    html += '</div>';
+    html += '</details>';
+    html += '</div>';
+
+    container.innerHTML = html;
+  }
+
 })();

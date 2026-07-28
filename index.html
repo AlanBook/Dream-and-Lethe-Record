@@ -78,74 +78,8 @@
           <button id="exportChart" style="padding:0.75rem 1.5rem;background:var(--c-accent);color:#f5ebe0;border:none;border-radius:8px;font-size:1rem;cursor:pointer;">📥 导出图表为PNG</button>
         </div>
       </div>
-      <div class="stats-container reveal">
-  <div class="stats-section">
-    <h3 class="stats-title">📊 原创曲统计</h3>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-label">播放量</div>
-        <div class="stat-value">最高：1188.0万（万象霜天）</div>
-        <div class="stat-value">最低：38.2万（大风起兮）</div>
-        <div class="stat-value">平均：281.5万</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">弹幕数</div>
-        <div class="stat-value">最高：8.4万（旷古回响）</div>
-        <div class="stat-value">最低：1167（牡丹乱）</div>
-        <div class="stat-value">平均：8273</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">点赞数</div>
-        <div class="stat-value">最高：41.8万（木兰行）</div>
-        <div class="stat-value">最低：3.3万（大风起兮）</div>
-        <div class="stat-value">平均：9.8万</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">投币数</div>
-        <div class="stat-value">最高：33.3万（万象霜天）</div>
-        <div class="stat-value">最低：1.6万（牡丹乱）</div>
-        <div class="stat-value">平均：7.5万</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">收藏数</div>
-        <div class="stat-value">最高：30.6万（木兰行）</div>
-        <div class="stat-value">最低：1.8万（牡丹乱）</div>
-        <div class="stat-value">平均：7.2万</div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="stats-section">
-    <h3 class="stats-title">🏆 播放成就统计</h3>
-    <div class="achievement-grid">
-      <div class="achievement-item myth">
-        <span class="achievement-label">神话</span>
-        <span class="achievement-count">1</span>
-      </div>
-      <div class="achievement-item shenshe">
-        <span class="achievement-label">申舌</span>
-        <span class="achievement-count">4</span>
-      </div>
-      <div class="achievement-item legend">
-        <span class="achievement-label">传说</span>
-        <span class="achievement-count">46</span>
-      </div>
-      <div class="achievement-item hall">
-        <span class="achievement-label">殿堂</span>
-        <span class="achievement-count">3</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="stats-section">
-    <details class="note-text" style="margin-bottom:1rem;">
-      <summary style="color:var(--c-gold);cursor:pointer;font-weight:600;font-size:1.3rem;">📝 图表说明</summary>
-      <div style="margin-top:1rem;">
-        <p><strong>对数刻度设计：</strong>为了让200万以下播放量的歌曲有更好的展示空间，本图表采用对数刻度（log₁₀），而非线性刻度。这样可以避免高播放量歌曲使图表过于压缩，同时更清晰地展示低播放量区间的变化趋势。</p>
-        <p><strong>数据收集截止时间：</strong>2026年4月6日</p>
-      </div>
-    </details>
-  </div>
+      <div class="stats-container reveal" id="statsSummary">
+  <!-- 统计摘要由 js/app.js 中的 renderStatsSummary() 动态生成 -->
 </div>
       <div style="text-align:center;margin-top:1.5rem;">
         <a href="chart.png" download="忘川风华录_音企原创曲概览.png" style="display:inline-block;padding:0.75rem 1.5rem;background:var(--c-accent);color:#f5ebe0;border-radius:8px;text-decoration:none;font-size:1rem;">📥 下载图表图片</a>
@@ -638,7 +572,7 @@
   <div class="wrap" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
     <div style="display: flex; flex-direction: column; align-items: center; max-width: 100%;">
       <p style="font-size:1.2rem;text-align: center;">©️忘川风华录（Dream and Lethe Record）安利介绍网页 Alanbook</p>
-      <p style="font-size:1rem;text-align: center;">注：本页面文字内容含AI生成，可能存在错误，需要二次确证；但数据收集部分都为真实收集，经过核实。</p>
+      <p style="font-size:1rem;text-align: center;">注：本页面文字内容含AI生成，可能存在不准确之处，需要二次确证；但数据收集部分都为真实收集，经过核实。</p>
     </div>
     <a href="https://space.bilibili.com/16620133" target="_blank" style="background:#3d2a4a;color:#fff;padding:8px 16px;border-radius:4px;text-decoration:none;font-size:0.9rem;">萧煜明的Bilibili</a>
   </div>

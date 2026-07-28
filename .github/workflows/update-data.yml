@@ -1,0 +1,36 @@
+name: 月度数据自动更新
+
+on:
+  schedule:
+    # 每月1日凌晨2点（UTC），北京时间10:00
+    - cron: '0 2 1 * *'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 安装依赖
+        run: npm install
+
+      - name: 采集B站最新数据
+        run: npm run fetch
+        timeout-minutes: 15
+
+      - name: 提交更新
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: 月度数据自动更新 (${{ github.ref_name }})'
+          file_pattern: 'js/data.js data/*.js'
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
