@@ -906,5 +906,12 @@ const DATA = {
     "start_date": "2018-06-22",
     "end_date": "2019-04-05"
   }
-]
+],
+  getAchievement: function(play) {
+    if (play >= 10000000) return '神话';
+    if (play >= 5000000) return '申舌';
+    if (play >= 1000000) return '传说';
+    if (play >= 100000) return '殿堂';
+    return null;
+  }
 };

@@ -178,21 +178,22 @@
       ctx.textBaseline = 'top';
       ctx.fillText('播放量：' + formatPlayCount(song.stats.play), x, y + pointRadius + 10);
 
-      if (song.achievement) {
+      const achievement = DATA.getAchievement(song.stats.play);
+      if (achievement) {
         let achievementColor = '#666666';
-        if (song.achievement === '殿堂') {
+        if (achievement === '殿堂') {
           achievementColor = '#2563eb';
-        } else if (song.achievement === '传说') {
+        } else if (achievement === '传说') {
           achievementColor = '#d4a85c';
-        } else if (song.achievement === '神话') {
+        } else if (achievement === '神话') {
           achievementColor = '#b85c4a';
-        } else if (song.achievement === '申舌') {
+        } else if (achievement === '申舌') {
           achievementColor = '#ff6b35';
         }
         
         ctx.fillStyle = achievementColor;
         ctx.font = 'bold 13px "Noto Serif SC"';
-        ctx.fillText(song.achievement, x, y + pointRadius + 30);
+        ctx.fillText(achievement, x, y + pointRadius + 30);
       }
     });
 
@@ -361,7 +362,7 @@
     // 播放成就统计
     const achievementCount = {};
     songs.forEach(s => {
-      const a = s.achievement || '未知';
+      const a = DATA.getAchievement(s.stats.play) || '未知';
       achievementCount[a] = (achievementCount[a] || 0) + 1;
     });
 
@@ -450,7 +451,7 @@
     html += '<div class="stats-section">';
     html += '<details class="note-text" style="margin-bottom:1rem;">';
     html += '<summary style="color:var(--c-gold);cursor:pointer;font-weight:600;font-size:1.3rem;">📝 图表说明</summary>';
-    html += '<div style="margin-top:1rem;">';
+    html += '<div style="margin-top:1rem;font-size:1rem;">';
     html += '<p><strong>对数刻度设计：</strong>为了让200万以下播放量的歌曲有更好的展示空间，本图表采用对数刻度（log₁₀），而非线性刻度。这样可以避免高播放量歌曲使图表过于压缩，同时更清晰地展示低播放量区间的变化趋势。</p>';
     html += '<p><strong>数据最后更新：</strong>' + latestDate + '</p>';
     html += '</div>';
