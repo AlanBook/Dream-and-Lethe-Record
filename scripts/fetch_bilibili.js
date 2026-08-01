@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const DATA_JS_PATH = path.join(__dirname, '..', 'js', 'data.js');
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -41,17 +42,19 @@ function formatNum(n) {
 // 从 data.js 提取 DATA 对象
 function loadData() {
   const content = fs.readFileSync(DATA_JS_PATH, 'utf8');
-  // 找到 "songs": [ 的位置和对应的结束 ]
-  const songsMatch = content.match(/"songs":\s*(\[[\s\S]*?\])\s*,/);
-  const producersMatch = content.match(/"producers":\s*(\[[\s\S]*?\])\s*\}/);
-  
-  if (!songsMatch || !producersMatch) {
-    throw new Error('无法解析 data.js');
-  }
+  try {
+    const script = new vm.Script(`${content}\n;DATA;`);
+    const data = script.runInNewContext({}, { timeout: 1000 });
 
-  const songs = JSON.parse(songsMatch[1]);
-  const producers = JSON.parse(producersMatch[1]);
-  return { songs, producers };
+    if (!data || !Array.isArray(data.songs) || !Array.isArray(data.producers)) {
+      throw new Error('DATA 结构不完整');
+    }
+
+    // 与原逻辑保持一致：返回可变引用，后续直接更新 songs 后写回
+    return { songs: data.songs, producers: data.producers };
+  } catch (err) {
+    throw new Error(`无法解析 data.js: ${err.message}`);
+  }
 }
 
 // 生成 data.js 内容（与 extract_excel.js 相同格式）
